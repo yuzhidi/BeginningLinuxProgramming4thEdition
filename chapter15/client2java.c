@@ -28,7 +28,7 @@ void printTime() {
 	printf("\n%s\n",asctime(localtime(&timep)));
 }
 
-int main()
+int main(int argc, char * argv[])
 {
 	int run;
 	int sockfd;
@@ -36,6 +36,10 @@ int main()
 	int i;
 	struct sockaddr_in address;
 	int result;
+
+	unsigned char * addr = "192.168.43.1";
+	int port = 8000;
+
 	unsigned char ACDE0005[5] = {0xAC, 0xED, 0x00, 0x05, 0};
 	unsigned char ACDE000500[6] = {0xAC, 0xED, 0x00, 0x05,0x00, 0};
 	unsigned char MAGIC_NUMBER[5] = {0xFF, 0xFF, 0xFF, 0xFF, 0};
@@ -48,21 +52,19 @@ int main()
 
 	double latitude;
 	double longitude;
-	//	unsigned long testLong;
-	/*  Create a socket for the client.  */
+
+	if(argc == 3) {
+		addr = argv[1];
+		port = atoi(argv[2]);
+	}
+
+	printf("addr:%s, port:%d\n", addr, port);
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-	/*  Name the socket, as agreed with the server.  */
-
 	address.sin_family = AF_INET;
-	//address.sin_addr.s_addr = inet_addr("10.120.0.81");
-	address.sin_addr.s_addr = inet_addr("192.168.43.1");
-	//	address.sin_addr.s_addr = inet_addr("10.120.0.148");
-	address.sin_port = htons(8000);
+	address.sin_addr.s_addr = inet_addr(addr);
+	address.sin_port = htons(port);
 	len = sizeof(address);
-
-	/*  Now connect our socket to the server's socket.  */
 
 	result = connect(sockfd, (struct sockaddr *)&address, len);
 
@@ -85,8 +87,8 @@ int main()
 		printf("not acde00005, continue\n");
 		exit(0);
 	}
+
 	run = 1;
-	/*  We can now read/write via sockfd.  */
 	while(run) {
 		printTime();
 		// 77:18  
@@ -102,7 +104,6 @@ int main()
 			}
 		}
 		// at least will recevie 5 int, the length is 20 bytes
-		//
 		if(read(sockfd, readbuf,16) <=0) {
 			perror(" oops: client2");
 			exit(1);
