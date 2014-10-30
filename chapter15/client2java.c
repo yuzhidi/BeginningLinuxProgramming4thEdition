@@ -41,7 +41,6 @@ int main(int argc, char * argv[])
 	int port = 8000;
 
 	unsigned char ACDE0005[5] = {0xAC, 0xED, 0x00, 0x05, 0};
-	unsigned char ACDE000500[6] = {0xAC, 0xED, 0x00, 0x05,0x00, 0};
 	unsigned char MAGIC_NUMBER[5] = {0xFF, 0xFF, 0xFF, 0xFF, 0};
 	unsigned char readbuf[128] = {0};
 	//data
@@ -79,9 +78,7 @@ int main(int argc, char * argv[])
 	}
 
 	printBuf(readbuf,LEN_ACDE0);
-	if(strstr(readbuf, ACDE000500)) {
-		printf("find ACDE000500\n");
-	} else if(strstr(readbuf, ACDE0005)) {
+	if(strstr(readbuf, ACDE0005)) {
 		printf("find ACDE0005\n");
 	} else {
 		printf("not acde00005, continue\n");
@@ -91,10 +88,14 @@ int main(int argc, char * argv[])
 	run = 1;
 	while(run) {
 		printTime();
-		// 77:18  
+		// find magic number 
 		int find = 4;
 		while(find) {
-			read(sockfd, readbuf,1);
+			if(read(sockfd, readbuf,1)<1) {
+				perror(" oops: client2");
+				exit(1);
+			}
+
 			printBuf(readbuf,1);
 			if(0xFF == readbuf[0]) {
 				find--;
@@ -103,7 +104,7 @@ int main(int argc, char * argv[])
 				find=4;
 			}
 		}
-		// at least will recevie 5 int, the length is 20 bytes
+		// at least will recevie 4 int, the length is 16 bytes
 		if(read(sockfd, readbuf,16) <=0) {
 			perror(" oops: client2");
 			exit(1);
