@@ -72,38 +72,10 @@ int main(int argc, char * argv[])
 		exit(1);
 	}
 
-	if(read(sockfd, readbuf,LEN_ACDE0) <=0) {
-		perror("oops: client2");
-		exit(1);
-	}
-
-	printBuf(readbuf,LEN_ACDE0);
-	if(strstr(readbuf, ACDE0005)) {
-		printf("find ACDE0005\n");
-	} else {
-		printf("not acde00005, continue\n");
-		exit(0);
-	}
-
 	run = 1;
 	while(run) {
 		printTime();
 		// find magic number 
-		int find = 4;
-		while(find) {
-			if(read(sockfd, readbuf,1)<1) {
-				perror(" oops: client2");
-				exit(1);
-			}
-
-			printBuf(readbuf,1);
-			if(0xFF == readbuf[0]) {
-				find--;
-				printf("find once:%d\n",find);
-			}else {
-				find=4;
-			}
-		}
 		// at least will recevie 4 int, the length is 16 bytes
 		if(read(sockfd, readbuf,16) <=0) {
 			perror(" oops: client2");
